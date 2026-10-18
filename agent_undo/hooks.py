@@ -23,11 +23,7 @@ def get_session_file() -> Path:
 
 
 def get_session_id() -> str:
-<<<<<<< HEAD
     """Get or create a session ID for this agent-undo session."""
-=======
-    """Get or create the current session ID."""
->>>>>>> origin/fix/session-id-and-checkpoint-prefix
     sf = get_session_file()
     if sf.exists():
         return sf.read_text().strip()
