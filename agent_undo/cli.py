@@ -95,7 +95,6 @@ def cmd_checkpoint(args: list[str]) -> int:
 
 
 def cmd_rollback(args: list[str]) -> int:
-<<<<<<< HEAD
     """Generate a rollback script or show simulation."""
     db_path = Path(args[0]) if args else get_default_db()
     checkpoint = None
@@ -105,18 +104,10 @@ def cmd_rollback(args: list[str]) -> int:
             dry_run = True
         elif checkpoint is None:
             checkpoint = arg
-=======
-    """Generate a rollback script."""
-    db_path = Path(args[0]) if args else DEFAULT_DB
-    checkpoint = args[1] if len(args) > 1 else None
-    if checkpoint and checkpoint.startswith("checkpoint:"):
-        checkpoint = checkpoint[len("checkpoint:"):]
->>>>>>> origin/fix/session-id-and-checkpoint-prefix
 
     journal = Journal(db_path)
     session_id = get_session_id()
 
-<<<<<<< HEAD
     if dry_run:
         gen = RollbackGenerator(journal)
         if checkpoint is None:
@@ -160,13 +151,6 @@ def cmd_rollback(args: list[str]) -> int:
         script = gen.generate(session_id, target_op_id=first_op_id)
     else:
         script = gen.generate(session_id, checkpoint_label=checkpoint)
-=======
-    try:
-        script = gen.generate(session_id, checkpoint_label=checkpoint)
-    except ValueError as exc:
-        print(f"agent-undo: {exc}", file=sys.stderr)
-        return 1
->>>>>>> origin/fix/session-id-and-checkpoint-prefix
 
     output = "undo.sh"
     Path(output).write_text(script)
