@@ -11,7 +11,9 @@ from pathlib import Path
 from .journal import Journal
 from .rollback import RollbackGenerator, preview_rollback, simulate_rollback
 
-DEFAULT_DB = Path.cwd() / ".agent-undo" / "journal.db"
+def get_default_db() -> Path:
+    """Resolve the default DB path at call time, not import time."""
+    return Path.cwd() / ".agent-undo" / "journal.db"
 
 
 def get_session_id() -> str:
@@ -27,7 +29,7 @@ def get_session_id() -> str:
 
 def cmd_init(args: list[str]) -> int:
     """Initialize agent-undo in the current project."""
-    db_path = Path(args[0]) if args else DEFAULT_DB
+    db_path = Path(args[0]) if args else get_default_db()
     journal = Journal(db_path)
     session_id = get_session_id()
     journal.checkpoint(session_id, "session-start")
@@ -38,7 +40,7 @@ def cmd_init(args: list[str]) -> int:
 
 def cmd_log(args: list[str]) -> int:
     """Log an operation manually."""
-    db_path = Path(args[0]) if args else DEFAULT_DB
+    db_path = Path(args[0]) if args else get_default_db()
     op_type = args[1] if len(args) > 1 else "manual"
 
     journal = Journal(db_path)
@@ -61,7 +63,7 @@ def cmd_log(args: list[str]) -> int:
 
 def cmd_timeline(args: list[str]) -> int:
     """Show the operation timeline."""
-    db_path = Path(args[0]) if args else DEFAULT_DB
+    db_path = Path(args[0]) if args else get_default_db()
     journal = Journal(db_path)
     session_id = get_session_id()
 
@@ -81,7 +83,7 @@ def cmd_timeline(args: list[str]) -> int:
 
 def cmd_checkpoint(args: list[str]) -> int:
     """Create a named checkpoint."""
-    db_path = Path(args[0]) if args else DEFAULT_DB
+    db_path = Path(args[0]) if args else get_default_db()
     label = args[1] if len(args) > 1 else "checkpoint"
 
     journal = Journal(db_path)
@@ -93,7 +95,7 @@ def cmd_checkpoint(args: list[str]) -> int:
 
 def cmd_rollback(args: list[str]) -> int:
     """Generate a rollback script or show simulation."""
-    db_path = Path(args[0]) if args else DEFAULT_DB
+    db_path = Path(args[0]) if args else get_default_db()
     checkpoint = None
     dry_run = False
     for arg in args[1:]:
@@ -158,7 +160,7 @@ def cmd_rollback(args: list[str]) -> int:
 
 def cmd_preview(args: list[str]) -> int:
     """Preview a rollback."""
-    db_path = Path(args[0]) if args else DEFAULT_DB
+    db_path = Path(args[0]) if args else get_default_db()
     checkpoint = args[1] if len(args) > 1 else None
 
     journal = Journal(db_path)
@@ -170,7 +172,7 @@ def cmd_preview(args: list[str]) -> int:
 
 def cmd_stats(args: list[str]) -> int:
     """Show journal statistics."""
-    db_path = Path(args[0]) if args else DEFAULT_DB
+    db_path = Path(args[0]) if args else get_default_db()
     journal = Journal(db_path)
     stats = journal.get_statistics()
     print(json.dumps(stats, indent=2))

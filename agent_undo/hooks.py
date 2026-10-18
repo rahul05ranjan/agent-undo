@@ -11,7 +11,9 @@ from pathlib import Path
 
 from .journal import Journal
 
-DEFAULT_DB = Path.cwd() / ".agent-undo" / "journal.db"
+def get_default_db() -> Path:
+    """Resolve the default DB path at call time, not import time."""
+    return Path.cwd() / ".agent-undo" / "journal.db"
 
 
 def get_session_file() -> Path:
@@ -32,7 +34,7 @@ def get_session_id() -> str:
 
 def run_pre_tool_hook(tool_name: str, tool_input: str) -> None:
     """Record a tool use BEFORE it executes (Claude Code preToolUse hook)."""
-    db_path = Path(os.environ.get("AGENT_UNDO_DB", str(DEFAULT_DB)))
+    db_path = Path(os.environ.get("AGENT_UNDO_DB", str(get_default_db())))
     journal = Journal(db_path)
     session_id = get_session_id()
 
@@ -69,7 +71,7 @@ def run_pre_tool_hook(tool_name: str, tool_input: str) -> None:
 
 def run_post_tool_hook(tool_name: str, tool_output: str, exit_code: int) -> None:
     """Record a tool use AFTER it executes (Claude Code postToolUse hook)."""
-    db_path = Path(os.environ.get("AGENT_UNDO_DB", str(DEFAULT_DB)))
+    db_path = Path(os.environ.get("AGENT_UNDO_DB", str(get_default_db())))
     journal = Journal(db_path)
     session_id = get_session_id()
 
@@ -84,7 +86,7 @@ def run_post_tool_hook(tool_name: str, tool_output: str, exit_code: int) -> None
 
 def shell_wrapper(agent_cmd: list[str], db_path: Path | None = None) -> int:
     """Run an agent command with shell-level operation recording."""
-    db = db_path or DEFAULT_DB
+    db = db_path or get_default_db()
     journal = Journal(db)
     session_id = get_session_id()
 

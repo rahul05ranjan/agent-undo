@@ -24,3 +24,13 @@ def test_get_session_id_reuses_existing(tmp_path, monkeypatch):
     sf.parent.mkdir(parents=True)
     sf.write_text("sess-abc123def456")
     assert hooks.get_session_id() == "sess-abc123def456"
+
+
+def test_get_default_db_reflects_chdir(tmp_path, monkeypatch):
+    """get_default_db() must resolve cwd at call time, not import time."""
+    from agent_undo.hooks import get_default_db
+
+    monkeypatch.chdir(tmp_path)
+    db = get_default_db()
+    assert db.parent == tmp_path / ".agent-undo"
+    assert db.name == "journal.db"
