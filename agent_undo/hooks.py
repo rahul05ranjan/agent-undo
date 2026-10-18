@@ -11,6 +11,7 @@ from pathlib import Path
 
 from .journal import Journal
 
+
 def get_default_db() -> Path:
     """Resolve the default DB path at call time, not import time."""
     return Path.cwd() / ".agent-undo" / "journal.db"
