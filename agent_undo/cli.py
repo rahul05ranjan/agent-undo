@@ -153,7 +153,13 @@ def cmd_rollback(args: list[str]) -> int:
     parser.add_argument("--to")
     parser.add_argument("--output", default="undo.sh")
     parser.add_argument("--dry-run", dest="dry_run", action="store_true")
-    parsed = parser.parse_args(args)
+    parsed, unknown = parser.parse_known_args(args)
+
+    # Python 3.10/3.11 argparse rejects positional values that follow optionals
+    # (e.g. ["db", "--dry-run", "cp1"]) because "cp1" looks like an unknown option.
+    # parse_known_args collects them in `unknown`; treat the first as checkpoint_pos.
+    if unknown and not parsed.checkpoint_pos:
+        parsed.checkpoint_pos = unknown[0]
 
     db_path = Path(parsed.db_path) if parsed.db_path else get_default_db()
     checkpoint = parsed.to or parsed.checkpoint_pos
