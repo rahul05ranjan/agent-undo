@@ -121,15 +121,18 @@ def shell_wrapper(agent_cmd: list[str], db_path: Path | None = None) -> int:
     except FileNotFoundError:
         print(f"Command not found: {agent_cmd[0]}", file=sys.stderr)
         exit_code = 127
+    except OSError as exc:
+        print(f"Could not run command: {exc}", file=sys.stderr)
+        exit_code = 126
     except KeyboardInterrupt:
         exit_code = 130
 
-    journal.record(
-        session_id,
-        "shell-result",
-        command=f"{cmd_str} (exit={exit_code})",
-        exit_code=exit_code,
-    )
-
-    journal.checkpoint(session_id, "wrap-end")
+    finally:
+        journal.record(
+            session_id,
+            "shell-result",
+            command=f"{cmd_str} (exit={exit_code})",
+            exit_code=exit_code,
+        )
+        journal.checkpoint(session_id, "wrap-end")
     return exit_code

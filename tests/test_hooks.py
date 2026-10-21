@@ -46,3 +46,23 @@ def test_get_session_id_regenerates_empty_session_file(tmp_path, monkeypatch):
     assert session_id
     assert re.fullmatch(r"sess-[0-9a-f]{12}", session_id)
     assert sf.read_text().strip() == session_id
+
+
+def test_shell_wrapper_records_oserror_and_wrap_end(tmp_path, monkeypatch, capsys):
+    """A failed process launch returns 126 and still closes the journal span."""
+    monkeypatch.chdir(tmp_path)
+
+    def raise_permission_error(_command):
+        raise PermissionError(13, "Permission denied")
+
+    monkeypatch.setattr(hooks.subprocess, "run", raise_permission_error)
+    db_path = tmp_path / "journal.db"
+
+    assert hooks.shell_wrapper(["/not-executable"], db_path) == 126
+    assert "Could not run command" in capsys.readouterr().err
+
+    journal = hooks.Journal(db_path)
+    session_id = hooks.get_session_id()
+    result = journal.get_session_ops(session_id, "shell-result")
+    assert result[-1]["exit_code"] == 126
+    assert journal.find_checkpoint(session_id, "wrap-end") is not None
