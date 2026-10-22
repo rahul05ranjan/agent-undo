@@ -115,21 +115,29 @@ def shell_wrapper(agent_cmd: list[str], db_path: Path | None = None) -> int:
         metadata={"wrapped": True, "argv": agent_cmd},
     )
 
+    exit_code = 1
+
     try:
         result = subprocess.run(agent_cmd)
         exit_code = result.returncode
     except FileNotFoundError:
         print(f"Command not found: {agent_cmd[0]}", file=sys.stderr)
         exit_code = 127
+    except PermissionError as exc:
+        print(f"Permission denied: {exc}", file=sys.stderr)
+        exit_code = 126
+    except OSError as exc:
+        print(f"OSError: {exc}", file=sys.stderr)
+        exit_code = 1
     except KeyboardInterrupt:
         exit_code = 130
+    finally:
+        journal.record(
+            session_id,
+            "shell-result",
+            command=f"{cmd_str} (exit={exit_code})",
+            exit_code=exit_code,
+        )
+        journal.checkpoint(session_id, "wrap-end")
 
-    journal.record(
-        session_id,
-        "shell-result",
-        command=f"{cmd_str} (exit={exit_code})",
-        exit_code=exit_code,
-    )
-
-    journal.checkpoint(session_id, "wrap-end")
     return exit_code
