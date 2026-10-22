@@ -107,6 +107,35 @@ def test_record_post_tool_hook_is_journaled(tmp_path, monkeypatch):
     assert any(r[1] == "tool-result" for r in rows)
 
 
+def test_preview_accepts_lone_checkpoint_label(tmp_path, monkeypatch, capsys):
+    monkeypatch.chdir(tmp_path)
+    assert main(["init"]) == 0
+    assert main(["checkpoint", "before"]) == 0
+    assert main(["record", "--tool", "Bash", "--output", "ok", "--exit", "0"]) == 0
+
+    assert main(["preview", "before"]) == 0
+    out = capsys.readouterr().out
+    assert "Bash" in out
+    # No stray database file named after the label must be created.
+    assert not (tmp_path / "before").exists()
+
+
+def test_preview_existing_db_positional_still_previews_session(tmp_path, monkeypatch, capsys):
+    monkeypatch.chdir(tmp_path)
+    assert main(["init"]) == 0
+    db = tmp_path / ".agent-undo" / "journal.db"
+    assert main(["checkpoint", "before"]) == 0
+    assert main(["record", "--tool", "Bash", "--output", "ok", "--exit", "0"]) == 0
+    assert db.exists()
+
+    # Two positionals keep the documented <db> <label> semantics.
+    assert main(["preview", str(db), "before"]) == 0
+    assert "Bash" in capsys.readouterr().out
+
+    # A lone positional that IS an existing file is still a db path, not a label.
+    assert main(["preview", str(db)]) == 1
+
+
 def test_wrap_records_the_wrapped_command(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
     assert main(["init"]) == 0

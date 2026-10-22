@@ -231,8 +231,18 @@ def cmd_rollback(args: list[str]) -> int:
 
 def cmd_preview(args: list[str]) -> int:
     """Preview a rollback."""
-    db_path = _db_path(args)
-    checkpoint = args[1] if len(args) > 1 else None
+    if (
+        len(args) == 1
+        and not args[0].startswith("-")
+        and not Path(args[0]).exists()
+    ):
+        # A lone token that is not an existing journal file is a checkpoint
+        # label, mirroring `rollback <label>` (issue #83).
+        db_path = get_default_db()
+        checkpoint = args[0]
+    else:
+        db_path = _db_path(args)
+        checkpoint = args[1] if len(args) > 1 else None
     if checkpoint and checkpoint.startswith("checkpoint:"):
         checkpoint = checkpoint[len("checkpoint:") :]
 
