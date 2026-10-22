@@ -306,6 +306,11 @@ def main(argv: list[str] | None = None) -> int:
     if argv is None:
         argv = sys.argv[1:]
 
+    if argv and argv[0] in ("--help", "-h"):
+        print("Usage: agent-undo <command> [args...]")
+        print(f"Commands: {', '.join(COMMANDS.keys())}")
+        return 0
+
     if not argv or argv[0] not in COMMANDS:
         print("Usage: agent-undo <command> [args...]")
         print(f"Commands: {', '.join(COMMANDS.keys())}")

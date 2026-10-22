@@ -107,6 +107,14 @@ def test_record_post_tool_hook_is_journaled(tmp_path, monkeypatch):
     assert any(r[1] == "tool-result" for r in rows)
 
 
+def test_top_level_help_prints_usage_and_exits_zero(capsys):
+    assert main(["--help"]) == 0
+    out = capsys.readouterr().out
+    assert "Usage: agent-undo <command> [args...]" in out
+    assert "Commands:" in out
+    assert main(["-h"]) == 0
+
+
 def test_wrap_records_the_wrapped_command(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
     assert main(["init"]) == 0
