@@ -115,6 +115,8 @@ def shell_wrapper(agent_cmd: list[str], db_path: Path | None = None) -> int:
         metadata={"wrapped": True, "argv": agent_cmd},
     )
 
+    exit_code = 1
+
     try:
         result = subprocess.run(agent_cmd)
         exit_code = result.returncode
@@ -126,7 +128,6 @@ def shell_wrapper(agent_cmd: list[str], db_path: Path | None = None) -> int:
         exit_code = 126
     except KeyboardInterrupt:
         exit_code = 130
-
     finally:
         journal.record(
             session_id,
