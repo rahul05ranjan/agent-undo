@@ -154,9 +154,7 @@ def test_readme_has_a_bare_install_to_audit(readme_text: str) -> None:
     file passing vacuously because the extractor found nothing.
     """
     assert README.read_text(encoding="utf-8", errors="replace"), "README must not be empty"
-    git_installs = [
-        line for line in readme_text.splitlines() if "pip install git+" in line
-    ]
+    git_installs = [line for line in readme_text.splitlines() if "pip install git+" in line]
     assert git_installs, (
         "README must document at least one `pip install git+...` line; without "
         "one there is no install path for the guard to police"
@@ -234,14 +232,13 @@ def test_the_guard_detects_a_planted_offender() -> None:
         "```\n"
     )
     assert not declares_unpublished(bad_readme, DISTRIBUTION), (
-        "a README with no note must not be treated as declaring the package "
-        "unpublished"
+        "a README with no note must not be treated as declaring the package " "unpublished"
     )
     offenders = bare_install_offenders(bad_readme)
     assert offenders, "the extractor missed a planted bare `pip install agent-undo`"
-    assert offenders[0][1] == "pip install agent-undo", (
-        f"extractor misreported the planted offender as {offenders[0][1]!r}"
-    )
+    assert (
+        offenders[0][1] == "pip install agent-undo"
+    ), f"extractor misreported the planted offender as {offenders[0][1]!r}"
 
 
 def test_the_guard_accepts_the_corrected_readme() -> None:
@@ -267,8 +264,7 @@ def test_the_guard_accepts_the_corrected_readme() -> None:
         f"{bare_install_offenders(good_readme)}"
     )
     assert declares_unpublished(good_readme, DISTRIBUTION), (
-        "the corrected README shape must be recognised as declaring the "
-        "package unpublished"
+        "the corrected README shape must be recognised as declaring the " "package unpublished"
     )
 
 
@@ -286,6 +282,5 @@ def test_note_for_another_tool_does_not_satisfy_this_guard() -> None:
         "> **Not on PyPI yet.** Some other tool has no release.\n"
     )
     assert not declares_unpublished(text, DISTRIBUTION), (
-        "a note about an unrelated tool must not license a bare install of "
-        f"`{DISTRIBUTION}`"
+        "a note about an unrelated tool must not license a bare install of " f"`{DISTRIBUTION}`"
     )

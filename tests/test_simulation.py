@@ -220,6 +220,7 @@ class TestRollbackWithoutCheckpoint:
         monkeypatch.chdir(tmp_path)
 
         from agent_undo.cli import cmd_rollback
+
         db_path = str(journal.db_path)
         result = cmd_rollback([db_path, "--dry-run"])
 
@@ -239,6 +240,7 @@ class TestRollbackWithoutCheckpoint:
         monkeypatch.chdir(tmp_path)
 
         from agent_undo.cli import cmd_rollback
+
         db_path = str(journal.db_path)
         result = cmd_rollback([db_path, "--dry-run"])
 
@@ -260,6 +262,7 @@ class TestRollbackWithoutCheckpoint:
         monkeypatch.chdir(tmp_path)
 
         from agent_undo.cli import cmd_rollback
+
         db_path = str(journal.db_path)
         result = cmd_rollback([db_path, "--dry-run", "cp1"])
 

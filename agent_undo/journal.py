@@ -72,7 +72,7 @@ class Journal:
         timestamp: float | None = None,
     ) -> int:
         """Record an operation. Returns the row id."""
-        ts = timestamp or time.time()
+        ts = time.time() if timestamp is None else timestamp
         with self.transaction() as conn:
             cur = conn.execute(
                 """INSERT INTO operations
@@ -117,7 +117,7 @@ class Journal:
         with self.transaction() as conn:
             if op_type:
                 rows = conn.execute(
-                    'SELECT * FROM operations'
+                    "SELECT * FROM operations"
                     ' WHERE session_id = ? AND op_type = ? ORDER BY "timestamp"',
                     (session_id, op_type),
                 ).fetchall()

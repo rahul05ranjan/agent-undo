@@ -1,4 +1,5 @@
 """Tests for agent_undo.hooks."""
+
 from __future__ import annotations
 
 import re

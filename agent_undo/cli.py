@@ -163,7 +163,7 @@ def cmd_rollback(args: list[str]) -> int:
     db_path = Path(parsed.db_path) if parsed.db_path else get_default_db()
     checkpoint = parsed.to or parsed.checkpoint_pos
     if checkpoint and checkpoint.startswith("checkpoint:"):
-        checkpoint = checkpoint[len("checkpoint:"):]
+        checkpoint = checkpoint[len("checkpoint:") :]
     dry_run = parsed.dry_run
     output = parsed.output
 
@@ -180,6 +180,7 @@ def cmd_rollback(args: list[str]) -> int:
                 return 0
             # Build a plan from all operations (excluding checkpoints)
             from .rollback import RollbackOperation, RollbackPlan, format_simulation
+
             operations = [
                 RollbackOperation(
                     op_type=op["op_type"],
@@ -233,7 +234,7 @@ def cmd_preview(args: list[str]) -> int:
     db_path = _db_path(args)
     checkpoint = args[1] if len(args) > 1 else None
     if checkpoint and checkpoint.startswith("checkpoint:"):
-        checkpoint = checkpoint[len("checkpoint:"):]
+        checkpoint = checkpoint[len("checkpoint:") :]
 
     journal = Journal(db_path)
     session_id = get_session_id()

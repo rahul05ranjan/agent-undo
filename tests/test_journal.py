@@ -23,6 +23,14 @@ def test_record_and_retrieve(journal):
     assert ops[0]["path"] == "/tmp/foo.txt"
 
 
+def test_record_preserves_zero_timestamp(journal):
+    journal.record("test-session", "shell", command="x", timestamp=0)
+
+    ops = journal.get_session_ops("test-session")
+
+    assert ops[0]["timestamp"] == 0.0
+
+
 def test_checkpoint(journal):
     journal.record("test-session", "file-write", path="/tmp/bar.txt")
     op_id = journal.checkpoint("test-session", "test-checkpoint")
@@ -73,6 +81,7 @@ def test_git_classification_from_json_tool_input(tmp_path, monkeypatch):
     run_pre_tool_hook("Bash", git_input)
 
     from agent_undo.journal import Journal
+
     journal = Journal(db_path)
     session_id = get_session_id()
     ops = journal.get_session_ops(session_id)

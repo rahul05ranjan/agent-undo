@@ -74,7 +74,8 @@ def run_pre_tool_hook(tool_name: str, tool_input: str) -> None:
             pass
 
     journal.record(
-        session_id, op_type,
+        session_id,
+        op_type,
         command=command,
         path=path or None,
         content_before=content_before,

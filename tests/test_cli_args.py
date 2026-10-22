@@ -67,9 +67,7 @@ def test_rollback_accepts_the_checkpoint_prefix(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
     assert main(["init"]) == 0
     assert main(["checkpoint", "before-refactor"]) == 0
-    assert (
-        main(["rollback", "--to", "checkpoint:before-refactor", "--dry-run"]) == 0
-    )
+    assert main(["rollback", "--to", "checkpoint:before-refactor", "--dry-run"]) == 0
 
 
 def test_rollback_unknown_checkpoint_is_a_clean_error(tmp_path, monkeypatch, capsys):
